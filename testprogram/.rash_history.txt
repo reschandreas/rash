@@ -1,0 +1,88 @@
+cat main.c
+d
+a
+cat main.c
+cat
+cat 
+main.c
+cat main.c
+/bin/cat main.c
+cat main.c
+/bin/cat/ main.c
+cat main.c
+clear
+cat main.c
+[A
+vim main.c
+vim main.c
+cat
+ls 
+rm main.c
+rm main.o
+ls
+ls
+cat main.c
+[A
+vim main.c
+vim main.c
+cat
+ls 
+rm main.c
+rm main.o
+ls
+ls
+cat main.c
+[A
+vim main.c
+vim main.c
+cat
+ls 
+rm main.c
+rm main.o
+ls
+ls
+cat main.c
+[A
+vim main.c
+vim main.c
+cat
+ls 
+rm main.c
+rm main.o
+ls
+ls
+cat main.c
+[A
+vim main.c
+vim main.c
+cat
+cat main.c
+ls
+ls
+cat main.c
+ls
+ls
+make
+vim main.c
+ls
+cat main.c
+ls
+vim
+vim a
+ls
+cat main.c
+ls
+vim
+d
+hallo
+a
+d
+hello
+a
+cat main.c
+d
+
+sa
+
+asf
+
