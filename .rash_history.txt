@@ -1,0 +1,47 @@
+vim
+vim
+vim main.c
+vim test.c
+cat test.c?
+cat main.c
+rm test.c?
+vim test.txt
+vim main.c
+vim test.txt
+vim test.c
+vim mlfd
+vim hallo.txt
+vim test1.c
+vim test2.txt
+cat main.c
+cat main.
+cat main.c
+vim test.txt
+ls
+cat main.
+cat main.c
+vim test.txt
+ls
+vim main.c
+vim main.c
+rm main.o
+/bin/rm/ main.o
+rm main.o
+/bin/rm/ main.o
+exit
+rm main.o
+/bin/rm/ main.o
+exit
+exit 
+rm main.o
+/bin/rm/ main.o
+exit
+exit 
+vim main.c
+exit
+vim main.c
+exit
+exit 
+vim main.c
+exit
+exit 
