@@ -4,6 +4,8 @@
 #include <string.h>
 #include <signal.h>
 
+//Test
+
 static char cwd[100];
 
 void myprintf(char *text) {
