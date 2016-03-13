@@ -62,7 +62,7 @@ int programs() {
                 break;
             }
             default: {
-                wait((int *) 100);
+                wait(NULL);
                 signal(SIGINT, signalHandler);
                 signal(SIGCHLD, signalHandler);
 				return 0;
