@@ -4,15 +4,12 @@
 #include <string.h>
 #include <signal.h>
 
-//Test
-
 static char cwd[100];
 
 void myprintf(char *text) {
-    text != NULL ? printf("%s@rash:%s %s\n", getenv("USER"), getcwd(cwd, sizeof(cwd)), text) : printf("%s@rash:%s ",
-                                                                                                      getenv("USER"),
-                                                                                                      getcwd(cwd,
-                                                                                                             sizeof(cwd)));
+    text != NULL ?
+	printf("%s@rash:%s %s\n", getenv("USER"), getcwd(cwd, sizeof(cwd)), text) :
+	printf("%s@rash:%s ", getenv("USER"), getcwd(cwd, sizeof(cwd)));
 }
 
 static char *argv[256];
@@ -65,22 +62,24 @@ int programs() {
                 wait(NULL);
                 signal(SIGINT, signalHandler);
                 signal(SIGCHLD, signalHandler);
-				return 0;
+                return 0;
             }
         }
     }
-	return 1;
+    return 1;
 }
 
 int main(void) {
-    //signal(SIGINT, signalHandler);
-    //signal(SIGCHLD, signalHandler);
-    FILE *history = fopen(".rash_history.txt", "a+");
+    FILE *history = fopen(".rash_history.txt", "w");
     char *input = NULL;
     myprintf("Welcome to rash!\n\t\u00A9 Resch Andreas");
     while (input != NULL ? strncmp(input, "exit", strlen(input)) != 0 : 1) {
         myprintf(NULL);
-        input = (char *) malloc(sizeof(char) * 256);
+		input = (char *) malloc(sizeof(char *) * 256);
+        int j = 0;
+        for (j = 0; j < 256; j++) {
+            input[j] = '\0';
+        }
         fgets(input, 256, stdin);
         if (*(input) != '\n' && strncmp(input, "exit", strlen(input))) {
             fprintf(history, "%s", input);
