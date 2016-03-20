@@ -4,24 +4,35 @@
 #include <string.h>
 #include <signal.h>
 
+
+#define MAX_INPUT 256
+
 static char cwd[100];
 
 void myprintf(char *text) {
     text != NULL ?
-	printf("%s@rash:%s %s\n", getenv("USER"), getcwd(cwd, sizeof(cwd)), text) :
-	printf("%s@rash:%s ", getenv("USER"), getcwd(cwd, sizeof(cwd)));
+    printf("%s@rash:%s: %s\n", getenv("USER"), getcwd(cwd, sizeof(cwd)), text) :
+    printf("%s@rash:%s: ", getenv("USER"), getcwd(cwd, sizeof(cwd)));
+}
+
+void errprintf(char *text) {
+    myprintf(NULL);
+    printf("Couldn't run %s\n", text);
 }
 
 static char *argv[256];
 static int argc;
-static int pid;
+static int pid = 0;
+
+FILE *fhistory;
 
 void parseInput(char *input) {
     input = strtok(input, "\n");
-    for (argc = 0; argc < 256; argc++) {
+    for (argc = 0; argc < MAX_INPUT; argc++) {
         argv[argc] = NULL;
     }
     argc = 0;
+    fprintf(fhistory, "%s\n", input);
     char *param = strtok(input, " ");
     while (param) {
         argv[argc++] = param;
@@ -32,11 +43,17 @@ void parseInput(char *input) {
 void signalHandler(int sign) {
     switch (sign) {
         case SIGINT: {
-            kill(pid, SIGKILL);
+            if (pid != 0) {
+                kill(pid, SIGKILL);
+                pid = 0;
+            }
             break;
         }
         case SIGCHLD: {
-            kill(pid, SIGKILL);
+            if (pid != 0) {
+                kill(pid, SIGKILL);
+                pid = 0;
+            }
             break;
         }
     }
@@ -53,14 +70,16 @@ int programs() {
                 break;
             }
             case 0: {
-                execvp(argv[0], argv);
-                exit(1);
-                myprintf("Child couldn't run");
+                if (!strcmp(argv[0], "history")) {
+                    system("cat .rash_history.txt");
+                } else {
+                    execvp(argv[0], argv);
+                    errprintf(argv[0]);
+                }
                 break;
             }
             default: {
-                wait(NULL);
-                signal(SIGINT, signalHandler);
+                waitpid(pid, NULL, 0);
                 signal(SIGCHLD, signalHandler);
                 return 0;
             }
@@ -70,23 +89,23 @@ int programs() {
 }
 
 int main(void) {
-    FILE *history = fopen(".rash_history.txt", "w");
+    signal(SIGINT, signalHandler);
     char *input = NULL;
-    myprintf("Welcome to rash!\n\t\u00A9 Resch Andreas");
+    myprintf("Welcome to rash!\ndeveloped by Resch Andreas 3IA");
+    fhistory = fopen(".rash_history.txt", "a");
     while (input != NULL ? strncmp(input, "exit", strlen(input)) != 0 : 1) {
         myprintf(NULL);
-		input = (char *) malloc(sizeof(char *) * 256);
-        int j = 0;
-        for (j = 0; j < 256; j++) {
+        input = (char *) malloc(sizeof(char *) * MAX_INPUT);
+        int j;
+        for (j = 0; j < MAX_INPUT; j++) {
             input[j] = '\0';
         }
-        fgets(input, 256, stdin);
-        if (*(input) != '\n' && strncmp(input, "exit", strlen(input))) {
-            fprintf(history, "%s", input);
-            parseInput(input);
+        fgets(input, MAX_INPUT, stdin);
+        parseInput(input);
+        if (*(input) != '\n' && 0 != strncmp(input, "exit", strlen(input))) {
             programs();
         }
     }
-    fclose(history);
+    fclose(fhistory);
     return 0;
 }

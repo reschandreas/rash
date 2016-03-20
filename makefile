@@ -1,6 +1,6 @@
 OBJECTS=main.o
 CC=gcc
-ARGS=-Wall
+ARGS=
 TARGET=rash
 
 $(TARGET): $(OBJECTS)
