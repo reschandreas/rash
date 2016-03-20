@@ -27,7 +27,9 @@ static int pid = 0;
 FILE *fhistory;
 
 void parseInput(char *input) {
+    printf("///%s///\n", input);
     input = strtok(input, "\n");
+    printf("///%s///\n", input);
     for (argc = 0; argc < MAX_INPUT; argc++) {
         argv[argc] = NULL;
     }
@@ -38,6 +40,8 @@ void parseInput(char *input) {
         argv[argc++] = param;
         param = strtok(NULL, " ");
     }
+    printf("---%s---\n", argv[0]);
+    printf("+++%s+++\n", input);
 }
 
 void signalHandler(int sign) {
@@ -60,6 +64,9 @@ void signalHandler(int sign) {
 }
 
 int programs() {
+    if (!strcmp(argv[0], "exit")) {
+        return -1;
+    }
     if (!strcmp(argv[0], "cd")) {
         chdir(argv[1] == NULL ? getenv("HOME") : argv[1]);
     } else {
@@ -93,7 +100,9 @@ int main(void) {
     char *input = NULL;
     myprintf("Welcome to rash!\ndeveloped by Resch Andreas 3IA");
     fhistory = fopen(".rash_history.txt", "a");
-    while (input != NULL ? strncmp(input, "exit", strlen(input)) != 0 : 1) {
+    int end = 1;
+    //while (input != NULL ? strncmp(input, "exit", strlen(input)) != 0 : 1) {
+    while (end != -1) {
         myprintf(NULL);
         input = (char *) malloc(sizeof(char *) * MAX_INPUT);
         int j;
@@ -102,9 +111,12 @@ int main(void) {
         }
         fgets(input, MAX_INPUT, stdin);
         parseInput(input);
-        if (*(input) != '\n' && 0 != strncmp(input, "exit", strlen(input))) {
-            programs();
+        printf("???%s???\n", input);
+        if (*(input) != '\n') {
+            end = programs();
+            printf("%i\n", end);
         }
+        printf("***%s***\n", input);
     }
     fclose(fhistory);
     return 0;
