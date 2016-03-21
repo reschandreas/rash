@@ -26,7 +26,7 @@ static int pid = 0;
 
 FILE *fhistory;
 
-void parseInput(char *input) {
+int parseInput(char *input) {
     printf("///%s///\n", input);
     input = strtok(input, "\n");
     printf("///%s///\n", input);
@@ -40,8 +40,13 @@ void parseInput(char *input) {
         argv[argc++] = param;
         param = strtok(NULL, " ");
     }
+    if (!strcmp(argv[0], "exit")) {
+        printf("Input was exit\n");
+        return 0;
+    }
     printf("---%s---\n", argv[0]);
     printf("+++%s+++\n", input);
+    return 1;
 }
 
 void signalHandler(int sign) {
@@ -60,13 +65,12 @@ void signalHandler(int sign) {
             }
             break;
         }
+        default:
+            break;
     }
 }
 
 int programs() {
-    if (!strcmp(argv[0], "exit")) {
-        return -1;
-    }
     if (!strcmp(argv[0], "cd")) {
         chdir(argv[1] == NULL ? getenv("HOME") : argv[1]);
     } else {
@@ -88,21 +92,23 @@ int programs() {
             default: {
                 waitpid(pid, NULL, 0);
                 signal(SIGCHLD, signalHandler);
-                return 0;
+                break;
             }
         }
     }
+    printf("Hier unten");
     return 1;
 }
 
 int main(void) {
     signal(SIGINT, signalHandler);
-    char *input = NULL;
+    //char *input = NULL;
+    char input[MAX_INPUT];
     myprintf("Welcome to rash!\ndeveloped by Resch Andreas 3IA");
     fhistory = fopen(".rash_history.txt", "a");
     int end = 1;
     //while (input != NULL ? strncmp(input, "exit", strlen(input)) != 0 : 1) {
-    while (end != -1) {
+/*    while (end != -1) {
         myprintf(NULL);
         input = (char *) malloc(sizeof(char *) * MAX_INPUT);
         int j;
@@ -116,8 +122,18 @@ int main(void) {
             end = programs();
             printf("%i\n", end);
         }
-        printf("***%s***\n", input);
+        printf("***%s***\n", input);*/
+    //}
+    while (end) {
+        myprintf(NULL);
+        if (fgets(input, MAX_INPUT, stdin) == NULL)
+            break;
+        end = parseInput(input);
+        if (input[0] != '\n') {
+            end == 1 ? programs() : fclose(fhistory);
+            printf("%i\n", end);
+            printf("***%s***\n", input);
+        }
     }
-    fclose(fhistory);
     return 0;
 }
