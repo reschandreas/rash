@@ -18,12 +18,12 @@ static int pid = 0;
 /**
  * Feld das den aktuellen Pfad beinhaltet
  */
-static char cwd[100];
+static char cwd[MAX_INPUT];
 
 /**
  * Array für die Argumente der Benutzereingabe
  */
-static char *argv[256];
+static char *argv[MAX_INPUT];
 
 /**
  * Anzahl der Argumente des derzeitigen Befehls
@@ -69,15 +69,16 @@ int parseInput(char *input) {
     if (!strncmp(input, "\n", sizeof("\n"))) {
         return 0;
     }
-    input = strtok(input, "\n");
     for (argc = 0; argc < MAX_INPUT; argc++) {
         argv[argc] = NULL;
     }
+    input = strtok(input, "\n");
     argc = 0;
     fprintf(fhistory, "%s\n", input);
+    fflush(fhistory);
     char *param = strtok(input, " ");
     while (param) {
-        strcpy(argv[argc++], param);
+        argv[argc++] = param;
         param = strtok(NULL, " ");
     }
     if (!strcmp(argv[0], "exit")) {
@@ -120,6 +121,20 @@ void signalHandler(int sign) {
 }
 
 /**
+ * Gibt das Protokoll mit Nummerierung am Bildschirm aus
+ */
+void printhistory() {
+    FILE *fp = fopen(home, "r");
+    int i = 0;
+    char *line = malloc(sizeof(char *) * MAX_INPUT);
+    while (fgets(line, MAX_INPUT, fp) != NULL) {
+        printf("%i: %s", i, line);
+        i++;
+    }
+    fclose(fp);
+}
+
+/**
  * Methode die den Befehl des Benutzers ausführt, indem die Methode fork() aufgerufen
  * wird und der Elternprozess auf das Beenden des Kindprozesses wartet.
  */
@@ -145,20 +160,21 @@ void programs() {
             case 0: {
                 /**
                  * Wenn der eingebene Befehl "history" ist, wird die Protokollierungsdatei
-                 * im Homeverzeichnis des Benutzers mit Hilfe von "cat" ausgegeben
+                 * im Homeverzeichnis des Benutzers mit Hilfe von printHistory() ausgegeben
                  */
                 if (!strcmp(argv[0], "history")) {
-                    strcpy(argv[0], "cat");
-                    strcpy(argv[1], home);
+                    printhistory();
+                } else {
+                    /**
+                     * Kindprozess wird ausgeführt
+                     */
+                    execvp(argv[0], argv);
+                    /**
+                     * Gibt eine Fehlermeldung aus, falls der Befehl unbekannt war
+                     */
+                    errprintf(argv[0]);
                 }
-                /**
-                 * Kindprozess wird ausgeführt
-                 */
-                execvp(argv[0], argv);
-                /**
-                 * Gibt eine Fehlermeldung aus, falls der Befehl unbekannt war
-                 */
-                errprintf(argv[0]);
+                exit(1);
                 break;
             }
             default: {
@@ -186,7 +202,8 @@ int main(void) {
     struct passwd *pw = getpwuid(getuid());
     home = pw->pw_dir;
     strcat(home, "/.rash_history");
-    fhistory = fopen(home, "a");
+    fhistory = fopen(home, "a+");
+    printf("\n%s\n", home);
 
     /**
      * Ausgabe des Willkommensgrüße
