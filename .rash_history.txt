@@ -41,3 +41,85 @@ asfölaf
 exit
 history
 exit
+ls
+ls -a
+ls -l
+exit
+history
+exit
+history
+exit
+ls
+fönkadkömav
+exit
+ls
+fönkadkömav
+exit
+history
+exit
+history
+exit
+history
+exit
+history
+exit
+history
+exit
+history
+ls
+exit
+history
+exit
+history
+exit
+exit
+history
+exit
+history
+exit
+history
+history
+ls
+history
+exit
+ls
+history
+ls
+history
+exit
+history
+exit
+ls
+exit
+history
+exit
+exit
+ls
+history
+ls
+ls
+history
+exit
+ls
+ls -a
+history
+exit
+ls
+ls -a
+history
+exit
+ls
+history
+exit
+ls
+history
+exit
+ls
+ls -a
+cat main.c
+exit
+ls
+history
+ls
+ls -a
+exit

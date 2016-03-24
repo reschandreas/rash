@@ -3,11 +3,14 @@
 #include <stdlib.h>
 #include <string.h>
 #include <signal.h>
+#include <pwd.h>
 
 
 #define MAX_INPUT 256
 
 static char cwd[100];
+
+static char* home;
 
 void myprintf(char *text) {
     text != NULL ?
@@ -27,9 +30,10 @@ static int pid = 0;
 FILE *fhistory;
 
 int parseInput(char *input) {
-    printf("///%s///\n", input);
+    if (!strncmp(input, "\n", sizeof("\n"))) {
+        return 0;
+    }
     input = strtok(input, "\n");
-    printf("///%s///\n", input);
     for (argc = 0; argc < MAX_INPUT; argc++) {
         argv[argc] = NULL;
     }
@@ -41,11 +45,9 @@ int parseInput(char *input) {
         param = strtok(NULL, " ");
     }
     if (!strcmp(argv[0], "exit")) {
-        printf("Input was exit\n");
-        return 0;
+        fclose(fhistory);
+        exit(0);
     }
-    printf("---%s---\n", argv[0]);
-    printf("+++%s+++\n", input);
     return 1;
 }
 
@@ -77,16 +79,16 @@ int programs() {
         pid = fork();
         switch (pid) {
             case -1: {
-                myprintf("Erectile Dysfunction!");
+                myprintf("Couldn't fork!");
                 break;
             }
             case 0: {
                 if (!strcmp(argv[0], "history")) {
-                    system("cat .rash_history.txt");
-                } else {
+                    strcpy(argv[0], "cat");
+                    strcpy(argv[1], home);
+                }
                     execvp(argv[0], argv);
                     errprintf(argv[0]);
-                }
                 break;
             }
             default: {
@@ -96,19 +98,19 @@ int programs() {
             }
         }
     }
-    printf("Hier unten");
     return 1;
 }
 
 int main(void) {
     signal(SIGINT, signalHandler);
-    //char *input = NULL;
-    char input[MAX_INPUT];
+    char *input = NULL;
+    struct passwd *pw = getpwuid(getuid());
+    home = pw->pw_dir;
+    strcat(home, "/.rash_history");
+    printf("%s", home);
     myprintf("Welcome to rash!\ndeveloped by Resch Andreas 3IA");
-    fhistory = fopen(".rash_history.txt", "a");
-    int end = 1;
-    //while (input != NULL ? strncmp(input, "exit", strlen(input)) != 0 : 1) {
-/*    while (end != -1) {
+    fhistory = fopen(home, "a");
+    while (1) {
         myprintf(NULL);
         input = (char *) malloc(sizeof(char *) * MAX_INPUT);
         int j;
@@ -116,24 +118,10 @@ int main(void) {
             input[j] = '\0';
         }
         fgets(input, MAX_INPUT, stdin);
-        parseInput(input);
-        printf("???%s???\n", input);
-        if (*(input) != '\n') {
-            end = programs();
-            printf("%i\n", end);
+        if (parseInput(input)) {
+            programs();
         }
-        printf("***%s***\n", input);*/
-    //}
-    while (end) {
-        myprintf(NULL);
-        if (fgets(input, MAX_INPUT, stdin) == NULL)
-            break;
-        end = parseInput(input);
-        if (input[0] != '\n') {
-            end == 1 ? programs() : fclose(fhistory);
-            printf("%i\n", end);
-            printf("***%s***\n", input);
-        }
+        free(input);
     }
     return 0;
 }
