@@ -5,30 +5,59 @@
 #include <signal.h>
 #include <pwd.h>
 
-
-#define MAX_INPUT 256
+/**
+ * Maximale Länge der Benutzereingabe
+ */
+#define MAX_INPUT 1024
 
 static char cwd[100];
 
 static char* home;
 
+/**
+ * Gibt den Promptcode der rash am Bildschirm aus
+ * @param text kann NULL sein oder auch nicht
+ */
 void myprintf(char *text) {
     text != NULL ?
     printf("%s@rash:%s: %s\n", getenv("USER"), getcwd(cwd, sizeof(cwd)), text) :
     printf("%s@rash:%s: ", getenv("USER"), getcwd(cwd, sizeof(cwd)));
 }
-
+/**
+ * Gibt den Promptcode mit der entsprechenden Fehlermeldung aus
+ */
 void errprintf(char *text) {
     myprintf(NULL);
     printf("Couldn't run %s\n", text);
 }
-
+/**
+ * Array für die Argumente der Benutzereingabe
+ */
 static char *argv[256];
+
+/**
+ * Anzahl der Argumente des derzeitigen Befehls
+ */
 static int argc;
+
+/**
+ * Prozessid des Kindprozesses
+ */
 static int pid = 0;
 
+/**
+ * Datei in der die Benutzereingaben protokolliert werden
+ */
 FILE *fhistory;
 
+/**
+ * Verarbeitet die Eingabe des Benutzers indem es die Zeichenkette vom Zeilenvorschub abtrennt
+ * und anschließend in das array argv schreibt
+ * Falls der Parameter input "exit" ist, wird die Protokollierungsdatei geschlossen und das Programm
+ * beendet.
+ * @param input, Benutzereingabe
+ * @return 0, falls keine Eingabe stattfand, ansonsten 1
+ */
 int parseInput(char *input) {
     if (!strncmp(input, "\n", sizeof("\n"))) {
         return 0;
@@ -41,7 +70,7 @@ int parseInput(char *input) {
     fprintf(fhistory, "%s\n", input);
     char *param = strtok(input, " ");
     while (param) {
-        argv[argc++] = param;
+        strcpy(argv[argc++], param);
         param = strtok(NULL, " ");
     }
     if (!strcmp(argv[0], "exit")) {
@@ -51,6 +80,11 @@ int parseInput(char *input) {
     return 1;
 }
 
+/**
+ * Signalverarbeitungsroutine die bei den Signalen SIGINT und SIGCHLD den Kindprozess
+ * beendet und pid auf 0 setzt.
+ * @param sign, Signalid
+ */
 void signalHandler(int sign) {
     switch (sign) {
         case SIGINT: {
@@ -71,8 +105,11 @@ void signalHandler(int sign) {
             break;
     }
 }
-
-int programs() {
+/**
+ * Methode die den Befehl des Benutzers ausführt, indem die Methode fork() aufgerufen
+ * wird und der Elternprozess auf das Beenden des Kindprozesses wartet.
+ */
+void programs() {
     if (!strcmp(argv[0], "cd")) {
         chdir(argv[1] == NULL ? getenv("HOME") : argv[1]);
     } else {
@@ -98,7 +135,6 @@ int programs() {
             }
         }
     }
-    return 1;
 }
 
 int main(void) {
