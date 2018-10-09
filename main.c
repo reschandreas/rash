@@ -216,18 +216,19 @@ int main(void) {
          */
         myprintf(NULL);
 
-        input = (char *) malloc(sizeof(char *) * MAX_INPUT);
-        int j;
         /**
-         * Leeren des Feldes
+         * calloc liefert einen Buffer zurück, der bereits mit Nullen gefüllt ist, dies muss nicht mehr vom Programmierer getan werden.
          */
-        for (j = 0; j < MAX_INPUT; j++) {
-            input[j] = '\0';
+        input = (char *) calloc(sizeof(char *), MAX_INPUT);
+
+        /**
+         * Einlesen von der Benutzereingabe bis ein Zeilenvorschub kommt.
+         * Außerdem wird kontrolliert, ob der Benutzer ^D eingegeben hat, also das Programm beenden will.
+         */
+        if (fgets(input, MAX_INPUT, stdin) == NULL) {
+            printf("exit\n");
+            memcpy(input, "exit\n", 6);
         }
-        /**
-         * Einlesen von der Benutzereingabe bis ein Zeilenvorschub kommt
-         */
-        fgets(input, MAX_INPUT, stdin);
 
         /**
          * Konntrolliert ob die Eingabe nur ein Zeilenvorschub war
